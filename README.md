@@ -23,4 +23,4 @@ Point d'entree : `src/ui/Main.java` (classe `ui.Main`).
 
 ## Note
 
-Code retrouve dans une ancienne archive Eclipse et nettoye pour publication. Les fichiers temporaires et les identifiants de connexion en dur ont ete retires. Le fonctionnement complet n'a pas ete teste dans un environnement Oracle ici.
+Projet scolaire réalisé dans le cadre de ma formation en informatique. Il m'a permis de pratiquer la programmation orientée objet en Java, la création d'interfaces graphiques avec Swing et la gestion des données avec Oracle.
