@@ -1,0 +1,124 @@
+-- Executer ce script dans SQL*Plus en etant connecte a votre schema Oracle.
+-- ATTENTION : les tables et sequences du projet existantes seront supprimees.
+-- Aucun identifiant ou mot de passe n est inclus dans ce fichier.
+
+-- =====================================================
+-- PARTIE 3 : SUPPRESSION DES OBJETS EXISTANTS
+-- =====================================================
+
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE BANK_TRANSACTION CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE ACCOUNT CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE CUSTOMER CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE CUSTOMER_SEQ'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE ACCOUNT_SEQ'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE TRANSACTION_SEQ'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+
+-- =====================================================
+-- PARTIE 4 : CREATION DE LA TABLE CUSTOMER
+-- =====================================================
+
+CREATE TABLE CUSTOMER (
+    CUSTOMER_ID NUMBER PRIMARY KEY,
+    NIP NUMBER UNIQUE NOT NULL,
+    FIRST_NAME VARCHAR2(50) NOT NULL,
+    LAST_NAME VARCHAR2(50) NOT NULL,
+    EMAIL VARCHAR2(100),
+    PHONE VARCHAR2(20)
+);
+
+-- =====================================================
+-- PARTIE 5 : CREATION DE LA TABLE ACCOUNT
+-- =====================================================
+
+CREATE TABLE ACCOUNT (
+    ACCOUNT_NUMBER NUMBER PRIMARY KEY,
+    CUSTOMER_ID NUMBER NOT NULL,
+    BALANCE NUMBER(12,2) DEFAULT 0 NOT NULL,
+    ACCOUNT_TYPE VARCHAR2(20) NOT NULL,
+    OPENING_DATE DATE DEFAULT SYSDATE,
+
+    CONSTRAINT FK_ACCOUNT_CUSTOMER
+    FOREIGN KEY (CUSTOMER_ID)
+    REFERENCES CUSTOMER(CUSTOMER_ID)
+);
+
+-- =====================================================
+-- PARTIE 6 : CREATION DE LA TABLE BANK_TRANSACTION
+-- =====================================================
+
+CREATE TABLE BANK_TRANSACTION (
+    TRANSACTION_ID NUMBER PRIMARY KEY,
+    DESCRIPTION VARCHAR2(100),
+    AMOUNT NUMBER(12,2) NOT NULL,
+    TRANSACTION_DATE DATE DEFAULT SYSDATE,
+    TRANSACTION_TYPE VARCHAR2(20),
+    TRANSACTION_STATUS VARCHAR2(20),
+    SOURCE_ACCOUNT NUMBER,
+    TARGET_ACCOUNT NUMBER,
+
+    CONSTRAINT FK_TRANS_SOURCE
+    FOREIGN KEY (SOURCE_ACCOUNT)
+    REFERENCES ACCOUNT(ACCOUNT_NUMBER),
+
+    CONSTRAINT FK_TRANS_TARGET
+    FOREIGN KEY (TARGET_ACCOUNT)
+    REFERENCES ACCOUNT(ACCOUNT_NUMBER)
+);
+
+-- =====================================================
+-- PARTIE 7 : CREATION DES SEQUENCES
+-- =====================================================
+
+CREATE SEQUENCE CUSTOMER_SEQ START WITH 100 INCREMENT BY 1;
+
+CREATE SEQUENCE ACCOUNT_SEQ START WITH 1000 INCREMENT BY 1;
+
+CREATE SEQUENCE TRANSACTION_SEQ START WITH 1 INCREMENT BY 1;
+
+-- =====================================================
+-- PARTIE 8 : INSERTION DES DONNEES DE TEST
+-- =====================================================
+
+INSERT INTO CUSTOMER VALUES (
+    CUSTOMER_SEQ.NEXTVAL,
+    12345,
+    'Amine',
+    'Akdim',
+    'amine@mail.com',
+    '0600000000'
+);
+
+INSERT INTO ACCOUNT VALUES (
+    ACCOUNT_SEQ.NEXTVAL,
+    100,
+    5000,
+    'CHEQUING',
+    SYSDATE
+);
+
+INSERT INTO ACCOUNT VALUES (
+    ACCOUNT_SEQ.NEXTVAL,
+    100,
+    3000,
+    'SAVING',
+    SYSDATE
+);
+
+COMMIT;
+
+-- =====================================================
+-- PARTIE 9 : VERIFICATION
+-- =====================================================
+
+SELECT * FROM CUSTOMER;
+
+SELECT * FROM ACCOUNT;
+
+SELECT * FROM BANK_TRANSACTION;
